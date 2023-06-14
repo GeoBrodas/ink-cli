@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Text} from 'ink';
+import {Text} from 'ink';
 import {Select, TextInput} from '@inkjs/ui';
 import fs from 'fs';
 
@@ -15,7 +15,7 @@ export default function App({name = 'Stranger', start = true}: Props) {
 
 	const [feature, setFeature] = useState('');
 
-	// const [readData, setReadData] = useState('');
+	const [readData, setReadData] = useState([]);
 
 	useEffect(() => {
 		let timer: any;
@@ -49,21 +49,18 @@ export default function App({name = 'Stranger', start = true}: Props) {
 				placeholder="Enter your task"
 				onSubmit={name => {
 					fs.readFile('task.txt', (err, data) => {
-						if (err) {
+						if (err || data.length === 0) {
 							fs.writeFile('task.txt', name, err => {
 								if (err) throw err;
-								process.exit();
 							});
 						}
 
-						if (data) {
-							fs.appendFile('task.txt', `\n${name}`, err => {
-								if (err) throw err;
-
-								process.exit();
-							});
-						}
+						fs.appendFile('task.txt', `\n${name}`, err => {
+							if (err) throw err;
+						});
 					});
+
+					setFeature('');
 				}}
 			/>
 		);
@@ -73,13 +70,30 @@ export default function App({name = 'Stranger', start = true}: Props) {
 
 			let split = data.split('\n');
 
-			console.log(split);
+			//@ts-ignore
+			setReadData(split);
 		});
 
 		return (
-			<Box>
-				<Text>{'readData'}</Text>
-			</Box>
+			<Select
+				options={readData?.map((item: any, index: number) => ({
+					label: item,
+					value: index.toString(),
+				}))}
+				onChange={value => {
+					//@ts-ignore
+					let data = readData.filter((item: any, index) => index !== +value);
+
+					if (data) {
+						//@ts-ignore
+						fs.writeFile('task.txt', data.join('\n'), err => {
+							if (err) throw err;
+						});
+
+						setFeature('');
+					}
+				}}
+			/>
 		);
 	} else if (name === 'Geo') {
 		return (
@@ -95,8 +109,12 @@ export default function App({name = 'Stranger', start = true}: Props) {
 					{label: 'Create Task', value: 'create-task'},
 					{label: 'Delete Task', value: 'delete-task'},
 					{label: 'Complete Task', value: 'complete-task'},
+					{label: 'Exit', value: 'exit'},
 				]}
-				onChange={value => setFeature(value)}
+				onChange={value => {
+					setFeature(value);
+					if (value === 'exit') process.exit();
+				}}
 			/>
 		);
 	}
