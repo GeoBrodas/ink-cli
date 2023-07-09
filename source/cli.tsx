@@ -23,11 +23,8 @@ const cli = meow(
 			name: {
 				type: 'string',
 			},
-			start: {
-				type: 'boolean',
-			},
 		},
 	},
 );
 
-render(<App name={cli.flags.name} start={cli.flags.start} />);
+render(<App name={cli.flags.name} />);
