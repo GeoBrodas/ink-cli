@@ -4,8 +4,6 @@ import {ConfirmInput, Select, TextInput} from '@inkjs/ui';
 import fs from 'fs';
 import ContainerElement from './components/ContainerElement.js';
 import DisplayItems from './components/DisplayItems.js';
-// import Table from 'ink-table';
-// import GoBack from './components/GoBack.js';
 
 type Props = {
 	name: string | undefined;
